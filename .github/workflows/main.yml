@@ -34,13 +34,11 @@ jobs:
       - name: "Build APKs"
         run: ./gradlew --no-daemon :play-services-core:assembleMapboxDefault :play-services-core:assembleMapboxHuawei
 
-      - name: "Move APKs to Release Directory"
+      - name: "Rename APKs"
         run: |
           mkdir -p play-services-core/build/outputs/apk/releases
-          mv \
-            play-services-core/build/outputs/apk/mapboxDefault/release/*.apk \
-            play-services-core/build/outputs/apk/mapboxHuawei/release/*.apk \
-            play-services-core/build/outputs/apk/releases
+          mv play-services-core/build/outputs/apk/mapboxDefault/release/*.apk play-services-core/build/outputs/apk/releases/gmscore.apk
+          mv play-services-core/build/outputs/apk/mapboxHuawei/release/*.apk play-services-core/build/outputs/apk/releases/gmscore-huawei.apk
 
       - name: "Upload APKs as Artifact"
         uses: actions/upload-artifact@v4
@@ -105,3 +103,4 @@ jobs:
           files: ./artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
