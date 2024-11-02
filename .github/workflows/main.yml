@@ -75,7 +75,7 @@ jobs:
       - name: Calculate SHA256 for APK artifacts
         id: sha256_apk
         run: |
-          sha256=$(find ./artifacts -type f -name "*.apk" -exec sha256sum {} \;)
+          sha256=$(find ./artifacts -type f -name "*.apk" -exec sha256sum {} \; | awk '{print $1}')
           echo "sha256_apk=$sha256" >> $GITHUB_ENV
 
       - name: Create GitHub Release
@@ -86,8 +86,7 @@ jobs:
           name: "Release ${{ env.datetime }}"
           body: |
             Automated release from actions.
-            SHA256:
-            ${{ env.sha256_apk }}
+            SHA256: ${{ env.sha256_apk }}
           draft: false
           prerelease: false
         env:
@@ -100,3 +99,4 @@ jobs:
           files: ./artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
