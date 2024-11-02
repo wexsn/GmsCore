@@ -1,4 +1,4 @@
-name: AutoBuild & Release
+name: Release
 
 on:
   push:
@@ -42,6 +42,12 @@ jobs:
             play-services-core/build/outputs/apk/mapboxHuawei/release/*.apk \
             play-services-core/build/outputs/apk/releases
 
+      - name: "Upload APKs as Artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apks
+          path: play-services-core/build/outputs/apk/releases/*.apk
+
   create_release:
     needs: release
     runs-on: ubuntu-latest
@@ -60,10 +66,10 @@ jobs:
           git tag -a "v${{ env.datetime }}" -m "Release on ${{ env.datetime }}"
           git push origin "v${{ env.datetime }}"
 
-      - name: Download APK artifacts
+      - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
-          name: play-services-core/build/outputs/apk/releases
+          name: release-apks
           path: ./artifacts
 
       - name: Calculate SHA256 for APK artifacts
@@ -94,4 +100,3 @@ jobs:
           files: ./artifacts/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
