@@ -72,15 +72,16 @@ jobs:
           name: release-apks
           path: ./artifacts
 
-      - name: Calculate SHA256 for APK artifacts
+      - name: Calculate SHA256 checksums for APKs
         id: sha256_apk
         run: |
-          touch checksums.txt
+          checksums=""
           for apk in $(find ./artifacts -type f -name "*.apk"); do
             sha256=$(sha256sum "$apk" | awk '{print $1}')
-            echo "$apk: $sha256" >> checksums.txt
+            filename=$(basename "$apk")
+            checksums="$checksums\n$filename: $sha256"
           done
-          cat checksums.txt  # Output to view in logs
+          echo "checksums=$checksums" >> $GITHUB_ENV
 
       - name: Create GitHub Release
         id: create_release
@@ -91,7 +92,7 @@ jobs:
           body: |
             Automated release from actions.
             SHA256 checksums:
-            $(cat checksums.txt)
+            ${{ env.checksums }}
           draft: false
           prerelease: false
         env:
